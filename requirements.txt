@@ -1,0 +1,6 @@
+tree-sitter
+tree-sitter-python
+networkx
+openai
+docker
+python-dotenv
