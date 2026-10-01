@@ -5,6 +5,20 @@
 
 An AI-powered refactoring engine that parses Python code into a dependency graph, retrieves structural **and** semantic context for the function you want to improve, and asks GPT-4o to refactor it. Every result is verified in a Docker sandbox and scored with complexity metrics. Grounding the LLM in the call graph, instead of a blind prompt, keeps refactors consistent with the rest of the codebase.
 
+## 📸 Screenshots
+
+**Refactor result** — original vs. refactored with line-level diff and the behavior-verified badge:
+
+![Refactor result](docs/screenshots/result.jpg)
+
+**Dependency graph** — interactive call graph of the analyzed code:
+
+![Dependency graph](docs/screenshots/graph.jpg)
+
+**Quality metrics** — complexity, lines of code and maintainability before/after:
+
+![Metrics](docs/screenshots/metrics.jpg)
+
 ## 🏗️ Architecture
 
 ```mermaid
