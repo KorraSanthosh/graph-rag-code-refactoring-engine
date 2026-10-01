@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    ports:
+      - "80:8000"
+    env_file: .env
+    environment:
+      # Sandbox runs generated code in sibling containers via the host Docker socket.
+      SANDBOX_FALLBACK: disabled
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
