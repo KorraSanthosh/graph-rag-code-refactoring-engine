@@ -1,4 +1,4 @@
-# ☁️ Deploying to AWS
+# Deploying to AWS
 
 The app needs to start throwaway Docker containers (the sandbox), so the simplest correct
 target is **one EC2 instance running Docker**. Total time: ~10 minutes.
@@ -20,7 +20,7 @@ target is **one EC2 instance running Docker**. Total time: ~10 minutes.
    cd /opt/graph-rag && sudo docker compose up -d --build
    ```
 4. Open `http://<public-ip>/`. The header pill should read **sandbox: docker**.
-   Click 🔑 and enter your `ACCESS_KEY` once.
+   Click and enter your `ACCESS_KEY` once.
 
 Update later with `git pull && sudo docker compose up -d --build`.
 

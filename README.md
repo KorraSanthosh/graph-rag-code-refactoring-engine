@@ -1,11 +1,11 @@
-# 🕸️ Graph RAG Code Refactoring Engine
+# Graph RAG Code Refactoring Engine
 
 [![CI](https://github.com/KorraSanthosh/graph-rag-code-refactoring-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/KorraSanthosh/graph-rag-code-refactoring-engine/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue)
 
 An AI-powered refactoring engine that parses Python code into a dependency graph, retrieves structural **and** semantic context for the function you want to improve, and asks GPT-4o to refactor it. Every result is verified in a Docker sandbox and scored with complexity metrics. Grounding the LLM in the call graph, instead of a blind prompt, keeps refactors consistent with the rest of the codebase.
 
-## 📸 Screenshots
+## Screenshots
 
 **Refactor result** — original vs. refactored with line-level diff and the behavior-verified badge:
 
@@ -19,7 +19,7 @@ An AI-powered refactoring engine that parses Python code into a dependency graph
 
 ![Metrics](docs/screenshots/metrics.jpg)
 
-## 🏗️ Architecture
+## Architecture
 
 ```mermaid
 flowchart LR
@@ -39,7 +39,7 @@ flowchart LR
     G --> K[FastAPI + Web UI]
 ```
 
-## ✨ Features
+## Features
 
 - **Graph-RAG context**: BFS over callees plus ancestor lookup on the call graph
 - **Hybrid retrieval**: semantic fallback via OpenAI embeddings + FAISS when the graph has few neighbours
@@ -52,7 +52,7 @@ flowchart LR
 - **Production guards**: optional access key, per-IP rate limiting, input size limits, CORS config
 - **Deployable**: Dockerfile, docker-compose and an EC2 guide ([DEPLOY_AWS.md](DEPLOY_AWS.md))
 
-## 🧰 Tech Stack
+## Tech Stack
 
 | Technology | Purpose | Why chosen |
 |---|---|---|
@@ -66,7 +66,7 @@ flowchart LR
 | FastAPI | REST API | Typed schemas and auto-generated docs |
 | pyvis | Graph visualization | Interactive HTML output |
 
-## 🚀 Quick Start
+## Quick Start
 
 **Prerequisites:** Python 3.11+, Docker (for the sandbox), an OpenAI API key.
 
@@ -95,7 +95,7 @@ curl -X POST http://localhost:8000/api/v1/refactor \
   -d '{"source_code": "def process_data():\n    data = [1,2,3,4,5]\n    result = []\n    for item in data:\n        if item > 2:\n            result.append(item * 2 + 10)\n    return result", "target_function": "process_data", "max_attempts": 3}'
 ```
 
-## 📡 API Reference
+## API Reference
 
 | Method | Path | Description |
 |---|---|---|
@@ -106,7 +106,7 @@ curl -X POST http://localhost:8000/api/v1/refactor \
 | POST | `/api/v1/visualize` | Interactive HTML graph |
 | GET | `/` | Web UI |
 
-## 🔍 How It Works
+## How It Works
 
 1. **Parse** the source with Tree-sitter to extract functions, classes, imports and calls.
 2. **Build** a NetworkX digraph: functions/classes are nodes, calls are edges.
@@ -117,19 +117,19 @@ curl -X POST http://localhost:8000/api/v1/refactor \
 7. **Check behavior**: a harness executed in the same sandbox compares original vs. refactored outputs on synthesized inputs; any difference is fed back as the error.
 8. **Evaluate**: radon reports complexity, LOC and maintainability before/after.
 
-## ⚠️ Limitations
+## Limitations
 
 - Single-file input (no multi-file/repo analysis yet); methods are refactored but not behavior-tested.
 - Equivalence testing uses synthesized inputs, so it raises confidence but is not a proof.
 - Without Docker the dev fallback is *not* a security boundary — use Docker in any public deployment.
 
-## 🧪 Running Tests
+## Running Tests
 
 ```bash
 pytest tests/ -v --cov=src
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ├── src/
