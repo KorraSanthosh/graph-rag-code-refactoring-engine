@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graph RAG Refactoring Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/codemirror.min.css">
+  <link rel="stylesheet" href="/ui/style.css">
+</head>
+<body>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <header>
+    <div class="brand">
+      <div class="logo">⬡</div>
+      <div>
+        <h1>Graph RAG Refactoring Engine</h1>
+        <p>Dependency-graph-aware refactoring · sandbox-verified · behavior-checked</p>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill" id="pill-sandbox" title="Sandbox mode">sandbox: …</span>
+      <span class="pill" id="pill-model" title="LLM model">model: …</span>
+      <button class="pill btn-ghost" id="key-btn" title="Set access key">🔑</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" id="input-panel">
+      <div class="ide">
+        <div class="ide-title">
+          <span class="dots"><i></i><i></i><i></i></span>
+          <span class="ide-tab"><span class="py">🐍</span> main.py</span>
+          <select id="examples" aria-label="Load example">
+            <option value="">Load example…</option>
+          </select>
+        </div>
+        <textarea id="source-code" spellcheck="false" placeholder="Paste Python code here..."></textarea>
+        <div class="ide-status">
+          <span id="cursor-pos">Ln 1, Col 1</span>
+          <span class="spacer"></span>
+          <span>Spaces: 4</span>
+          <span>UTF-8</span>
+          <span class="lang">Python</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field grow">
+          <label for="target-function">Target function</label>
+          <select id="target-function"><option value="">Analyze to list functions</option></select>
+        </div>
+        <div class="field">
+          <label for="max-attempts">Attempts</label>
+          <input type="number" id="max-attempts" min="1" max="5" value="3">
+        </div>
+      </div>
+
+      <div class="row actions">
+        <button id="analyze-btn" class="btn secondary">Analyze</button>
+        <button id="refactor-btn" class="btn primary">Refactor ✨</button>
+      </div>
+
+      <ol class="steps" id="steps" hidden>
+        <li data-step="refactor_node">Refactor</li>
+        <li data-step="verify_node">Verify &amp; test</li>
+        <li data-step="evaluate_node">Evaluate</li>
+      </ol>
+      <div class="error" id="error" role="alert" hidden></div>
+    </section>
+
+    <section class="card" id="output-panel">
+      <nav class="tabs" role="tablist">
+        <button class="tab active" data-tab="result" role="tab">Result</button>
+        <button class="tab" data-tab="graph" role="tab">Graph</button>
+        <button class="tab" data-tab="metrics" role="tab">Metrics</button>
+      </nav>
+
+      <div class="tab-content active" id="tab-result">
+        <div class="empty" id="result-empty">
+          <div class="big">✨</div>Analyze your code, pick a function and hit <b>Refactor</b>.
+        </div>
+        <div id="result" hidden>
+          <div class="result-bar">
+            <span class="badge good" id="equiv-badge" hidden></span>
+            <span class="spacer"></span>
+            <button class="btn small" id="copy-btn">Copy refactored</button>
+            <button class="btn small" id="download-btn">Download .py</button>
+          </div>
+          <div class="diff">
+            <div class="ide ide-sm">
+              <div class="ide-title"><span class="dots"><i></i><i></i><i></i></span><span class="ide-tab bad-tab">original.py</span></div>
+              <div id="original-code" class="viewer"></div>
+            </div>
+            <div class="ide ide-sm">
+              <div class="ide-title"><span class="dots"><i></i><i></i><i></i></span><span class="ide-tab good-tab">refactored.py</span></div>
+              <div id="refactored-code" class="viewer"></div>
+            </div>
+          </div>
+          <p class="context" id="graph-context"></p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-graph">
+        <div class="empty" id="graph-empty"><div class="big">🕸️</div>Click <b>Analyze</b> to render the dependency graph.</div>
+        <iframe id="graph-frame" title="Dependency graph" sandbox="allow-scripts allow-same-origin" hidden></iframe>
+        <div class="legend" id="graph-legend" hidden>
+          <span><i style="background:#0f3460"></i>function</span>
+          <span><i style="background:#e94560"></i>class</span>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-metrics">
+        <div class="empty" id="metrics-empty"><div class="big">📊</div>Metrics appear after a successful refactor.</div>
+        <div id="metrics" hidden></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="status-bar"><span class="dot" id="status-dot"></span><span id="status-text">Ready</span></footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.20/addon/edit/closebrackets.min.js"></script>
+  <script src="/ui/bg.js"></script>
+  <script src="/ui/app.js"></script>
+</body>
+</html>
